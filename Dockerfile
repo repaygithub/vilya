@@ -14,6 +14,10 @@ ARG UBUNTU_VERSION
 ARG CUDA
 ARG CUDNN=7.4.1.5-1
 ARG PYTHON_VER=3.8
+# TODO: PIN VERSION for consistency
+ARG TF_PACKAGE=tensorflow-gpu
+ARG TF_PACKAGE_VERSION=
+
 ENV LANG C.UTF-8
 
 
@@ -39,7 +43,17 @@ RUN apt-get update &&\
         python-pip \
         python3-pip
 
+RUN     apt-get update && \
+        apt-get install nvinfer-runtime-trt-repo-ubuntu1604-5.0.2-ga-cuda${CUDA} \
+        && apt-get update \
+        && apt-get install -y --no-install-recommends libnvinfer5=5.0.2-1+cuda${CUDA} \
+        && apt-get clean \
+        && rm -rf /var/lib/apt/lists/*
 
+ENV LD_LIBRARY_PATH /usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
+
+
+#PYTHON SETUP VIA DEAD SNEKS
 RUN    apt-get install -y software-properties-common python-software-properties && \
        apt-add-repository ppa:deadsnakes/ppa && \
        apt-get update -y && \
@@ -51,13 +65,11 @@ RUN    apt-get install -y software-properties-common python-software-properties 
        python${PYTHON_VER} get-pip.py && \
        rm get-pip.py # &&  \
        ln -s $(which python${PYTHON_VER}) /usr/local/bin/python &&
+       pip --no-cache-dir install --upgrade \
+       pip\
+       setuptools\
 
 
-RUN     apt-get update && \
-        apt-get install nvinfer-runtime-trt-repo-ubuntu1604-5.0.2-ga-cuda${CUDA} \
-        && apt-get update \
-        && apt-get install -y --no-install-recommends libnvinfer5=5.0.2-1+cuda${CUDA} \
-        && apt-get clean \
-        && rm -rf /var/lib/apt/lists/*
+# INSTALL TF-GPU, DEFAULTS TO THE latest VERSION
+RUN ${PIP} install ${TF_PACKAGE}${TF_PACKAGE_VERSION:+==${TF_PACKAGE_VERSION}}
 
-ENV LD_LIBRARY_PATH /usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
