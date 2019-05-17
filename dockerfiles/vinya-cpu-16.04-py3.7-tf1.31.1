@@ -1,0 +1,36 @@
+
+ARG UBUNTU_VERSION=16.04
+
+FROM ubuntu:${UBUNTU_VERSION} as base
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends\
+    build-essential \
+    curl \
+    libfreetype6-dev \
+    libhdf5-serial-dev \
+    libzmq3-dev \
+    pkg-config \
+    software-properties-common \
+    unzip
+ARG PYTHON_VER=3.7
+
+ENV LANG C.UTF-8
+
+#PYTHON SETUP VIA DEAD SNEKS
+RUN    apt-add-repository ppa:deadsnakes/ppa && \
+       apt-get update -y && \
+       apt-get install -y --no-install-recommends \
+       python${PYTHON_VER} \
+       python${PYTHON_VER}-dev\
+       python${PYTHON_VER}-distutils && \
+       curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+       python${PYTHON_VER} get-pip.py && \
+       rm get-pip.py  &&  \
+       ln -s $(which python${PYTHON_VER}) /usr/local/bin/python &&\
+       pip --no-cache-dir install --upgrade \
+       pip \
+       setuptools
+ARG TF_PACKAGE=tensorflow==1.31.1
+
+RUN pip install ${TF_PACKAGE}
