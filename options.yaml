@@ -1,0 +1,23 @@
+options:
+
+  ubuntu_base:
+    - ubuntu
+    - ubuntu_nvidia
+
+  ubuntu_version :
+    -  "16.04"
+#    -  "18.04"
+
+  python_version:
+    - "3.7"
+
+  lab:
+#    - True
+    - False
+
+  tensorflow_version:
+    - "1.13.1"
+#    - "2.0.0a0"
+
+
+
