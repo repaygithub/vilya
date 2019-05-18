@@ -1,5 +1,7 @@
 FROM ubuntu:${UBUNTU_VERSION} as base
 
+SHELL ["/bin/bash", "-c"]
+
 RUN apt-get update && \
     apt-get install -y --no-install-recommends\
     build-essential \
@@ -9,4 +11,10 @@ RUN apt-get update && \
     libzmq3-dev \
     pkg-config \
     software-properties-common \
-    unzip
+    unzip \
+    sudo \
+     wget \
+    bzip2 \
+    ca-certificates \
+    locales \
+    fonts-liberation

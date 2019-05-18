@@ -25,7 +25,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         pkg-config \
         software-properties-common \
         unzip \
-        libnvinfer5=5.1.5-1+cuda${CUDA}
+        libnvinfer5=5.1.5-1+cuda${CUDA} \
+        sudo \
+        wget \
+        bzip2 \
+        ca-certificates \
+        locales \
+        fonts-liberation
+
 
 # For CUDA profiling, TensorFlow requires CUPTI.
 ENV LD_LIBRARY_PATH /usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH

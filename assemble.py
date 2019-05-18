@@ -15,6 +15,9 @@ ASSEMBLY_OPTIONS = os.path.join(HERE,'options.yaml')
 
 
 class BuildInstructions(object):
+    """
+    This just describes what is to be built and provides methods for writing docker files properly.
+    """
 
     def __init__(self,base,ubuntu_version,python_version,tf_version,install_lab):
         self.base_image = base
@@ -22,11 +25,12 @@ class BuildInstructions(object):
         self.python_version = python_version
         self.install_lab = install_lab
         self.tf_version = tf_version
-
-        if 'nvidia' in self.base_image:
-            self.tensorflow = 'tensorflow-gpu=={}'.format(self.tf_version)
-        else:
-            self.tensorflow = 'tensorflow=={}'.format(self.tf_version)
+        self.tensorflow = None
+        if self.tf_version:
+            if 'nvidia' in self.base_image:
+                self.tensorflow = 'tensorflow-gpu=={}'.format(self.tf_version)
+            else:
+                self.tensorflow = 'tensorflow=={}'.format(self.tf_version)
 
     def __str__(self):
         return str(dict(
@@ -40,13 +44,26 @@ class BuildInstructions(object):
 
     @property
     def docker_file_contents(self):
+        """
+        Generates a docker file based on the state of the object
+        :return:
+        """
         contents = []
 
-        contents.append(load_template('header').render())
         contents.append(load_template('ubuntu_version').render(ubuntu_version = self.ubuntu_version))
         contents.append(load_template(self.base_image).render())
+        contents.append(load_template('ubuntu_all').render(ubuntu_version=self.ubuntu_version))
         contents.append(load_template('python').render(python_version=self.python_version))
-        contents.append(load_template('tensorflow').render(tensorflow=self.tensorflow))
+
+        if self.tf_version:
+            contents.append(load_template('tensorflow').render(tensorflow=self.tensorflow))
+
+        if self.install_lab:
+            contents.append(load_template('jupyter_lab').render())
+        else:
+            contents.append(load_template('no_jupyter_lab').render())
+
+        contents.append(load_template('cleanup').render())
         return '\n'.join(contents)
 
     @property
@@ -56,7 +73,10 @@ class BuildInstructions(object):
             processor = 'gpu'
 
 
-        image_name = '-'.join(['vinya',processor,self.ubuntu_version,'py{}'.format(self.python_version),'tf{}'.format(self.tf_version)])
+        image_name = '-'.join([self.base_image,self.ubuntu_version,'py{}'.format(self.python_version)])
+
+        if self.tf_version:
+            image_name += '-tf{}'.format(self.tf_version)
 
         if self.install_lab:
             image_name += '-lab'
@@ -69,7 +89,7 @@ class BuildInstructions(object):
 
 def load_template(name):
     """
-    Get the path to the partial file needed
+    loads a partial template from disk and returns it as a Jinja template object
 
     :param name:
     :return:
@@ -81,7 +101,7 @@ def load_template(name):
 
 def compile_assembly_options(file):
     """
-    Read the assembly options yaml
+    Create docker files for each assembly option
 
     :param file:
     :return:
@@ -90,9 +110,6 @@ def compile_assembly_options(file):
     with open(file,'r') as f :
         assembly_options = yaml.load(f,Loader=Loader).get('options')
 
-    print(assembly_options)
-
-    partials_needed = list()
 
     for base in assembly_options.get('ubuntu_base'):
         for ubuntu_version in assembly_options.get('ubuntu_version'):
@@ -102,7 +119,7 @@ def compile_assembly_options(file):
                         b = BuildInstructions(base,ubuntu_version,python_version,tf_version,install_lab)
                         with open(os.path.join('dockerfiles',b.image_name),'w') as f:
                             print(b.docker_file_contents,file=f)
-
+                        yield b
 
 
 
@@ -114,7 +131,8 @@ def main():
     """
     Entry point for assembly script.
     """
-    compile_assembly_options(ASSEMBLY_OPTIONS)
+    for image in compile_assembly_options(ASSEMBLY_OPTIONS):
+        print(image)
 
 
 

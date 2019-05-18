@@ -5,19 +5,21 @@ options:
     - ubuntu_nvidia
 
   ubuntu_version :
-    -  "16.04"
-#    -  "18.04"
+   -  "16.04"
+   -  "18.04"
 
   python_version:
-    - "3.7"
+    - 3.7
+    - 3.6
 
   lab:
-#    - True
+    - True
     - False
 
   tensorflow_version:
+    - False
     - "1.13.1"
-#    - "2.0.0a0"
+    - "2.0.0a0"
 
 
 
