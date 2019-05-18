@@ -1,0 +1,106 @@
+ARG UBUNTU_VERSION=18.04
+
+FROM ubuntu:${UBUNTU_VERSION} as base
+
+SHELL ["/bin/bash", "-c"]
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends\
+    build-essential \
+    curl \
+    libfreetype6-dev \
+    libhdf5-serial-dev \
+    libzmq3-dev \
+    pkg-config \
+    software-properties-common \
+    unzip \
+    sudo \
+     wget \
+    bzip2 \
+    ca-certificates \
+    locales \
+    fonts-liberation
+LABEL maintainer="Dylan Storey <dstorey@repay.com>"
+ARG NB_USER="elrond"
+ARG NB_UID="1000"
+ARG NB_GID="100"
+
+
+
+
+ENV NB_USER=$NB_USER \
+    NB_UID=$NB_UID \
+    NB_GID=$NB_GID \
+    HOME=/home/$NB_USER
+
+
+ADD files/fix-permissions /usr/local/bin/fix-permissions
+
+RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
+    sed -i.bak -e 's/^%admin/#%admin/' /etc/sudoers && \
+    sed -i.bak -e 's/^%sudo/#%sudo/' /etc/sudoers && \
+    useradd -m -s /bin/bash -N -u $NB_UID $NB_USER && \
+    chmod g+w /etc/passwd && \
+    fix-permissions $HOME
+
+
+USER root
+ARG PYTHON_VER=3.7
+
+ENV LANG C.UTF-8
+
+#PYTHON SETUP VIA DEAD SNEKS
+RUN    apt-add-repository ppa:deadsnakes/ppa && \
+       apt-get update -y && \
+       apt-get install -y --no-install-recommends \
+       python${PYTHON_VER} \
+       python${PYTHON_VER}-dev  \
+       python${PYTHON_VER}-distutils
+
+
+RUN    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+       python${PYTHON_VER} get-pip.py && \
+       rm get-pip.py  &&  \
+       ln -s $(which python${PYTHON_VER}) /usr/local/bin/python &&\
+       pip --no-cache-dir install --upgrade \
+       pip \
+       setuptools
+ARG TF_PACKAGE=tensorflow==2.0.0a0
+
+RUN pip --no-cache-dir install ${TF_PACKAGE}
+
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
+    sudo apt-get install -y nodejs
+
+RUN pip install    \
+    notebook==5.7.8 \
+    jupyterhub==1.0.0 \
+    jupyterlab==0.35.5 && \
+    jupyter labextension install @jupyterlab/hub-extension@^0.12.0 && \
+    npm cache clean --force &&\
+    jupyter notebook --generate-config && \
+    rm -rf /home/$NB_USER/.cache/yarn &&\
+    fix-permissions /home/$NB_USER
+
+EXPOSE 8888
+
+
+
+ENV TINI_VERSION v0.18.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+ENTRYPOINT ["/tini", "--"]
+ENV JUPYTER_ENABLE_LAB=1
+CMD ["start-notebook.sh"]
+
+COPY files/start.sh /usr/local/bin/
+COPY files/start-notebook.sh /usr/local/bin/
+COPY files/start-singleuser.sh /usr/local/bin/
+COPY files/jupyter_notebook_config.py /etc/jupyter/
+RUN fix-permissions /etc/jupyter/
+
+RUN apt-get clean && rm -rf /var/lib
+
+WORKDIR $HOME
+
+USER $NB_UID
