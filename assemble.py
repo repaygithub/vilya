@@ -1,3 +1,4 @@
+#!/usr/bin/environment python3
 import os
 import yaml
 import docker
