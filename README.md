@@ -1,6 +1,6 @@
 # vilya
 
-Docker images for data science
+Docker images for data science / deep learning projects
 
 
 ## Features
@@ -13,15 +13,15 @@ Docker images for data science
 
 All images are named with the following convention :
 
-> <base-image>-<ubuntu-version>-<python-version>-<tensorflow-version>-<lab-present>
+> *base_image*__-__*ubuntu_version*__-__*python_version*__-__*tensorflow_version*__-__*lab_present*
 
 Where:
 
 - `base_image` denotes ubuntu with or without nvidia drivers
-- `ubuntu-version` denotes the version of ubuntu 
-- `python-version` denotes the version of python
-- `tensorflow-version` (tf+version) if present denotes the version of tensorflow.(GPU enabled versions installed on nvidia enabled ubuntus.)
-- `lab-present` if jupyter lab is built into the image 
+- `ubuntu_version` denotes the version of ubuntu 
+- `python_version` denotes the version of python
+- `tensorflow_version` (tf+version) if present denotes the version of tensorflow.(GPU enabled versions installed on nvidia enabled ubuntus.)
+- `lab_present` if jupyter lab is built into the image 
 
 
 ## Usage
@@ -79,4 +79,4 @@ pull request here =D )
 
 ### Testing 
 
-Its manual ATM - submit a PR to fix this or wait for a future date.
+It's manual ATM - submit a PR to fix this or wait for a future date.
