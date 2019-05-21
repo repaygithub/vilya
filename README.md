@@ -29,7 +29,7 @@ Where:
 
 Pulling current images from dockerhub:
 
-`docker pull repaydockerhub/image_name`
+`docker pull dockerrepay/image_name`
 
 
 Building locally:
