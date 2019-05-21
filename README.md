@@ -8,7 +8,8 @@ Docker images for data science / deep learning projects
 - `Ubuntu 16.04` and `Ubuntu 18.04`
 - `NVIDIA drivers` (requires a [nvidia](https://github.com/NVIDIA/nvidia-docker) runtime to be used)
 - `tensorflow 1.13.1` and `tensorflow 2.0.0a`
-- `JupyterLab`
+- `JupyterLab 0.35.5`
+- `JupyterHub 1.0.0`
 - `python 3.6` and `python 3.7`
 
 All images are named with the following convention :
