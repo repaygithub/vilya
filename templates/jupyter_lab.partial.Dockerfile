@@ -1,3 +1,4 @@
+RUN apt-get install -y --no-install-recommends gpg-agent || true
 
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
     sudo apt-get install -y nodejs

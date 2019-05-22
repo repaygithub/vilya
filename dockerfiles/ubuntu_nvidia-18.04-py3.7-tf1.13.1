@@ -36,6 +36,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         fonts-liberation
 
 
+
 # For CUDA profiling, TensorFlow requires CUPTI.
 ENV LD_LIBRARY_PATH /usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
 LABEL maintainer="Dylan Storey <dstorey@repay.com>"
@@ -74,9 +75,8 @@ RUN    apt-add-repository ppa:deadsnakes/ppa && \
        python${PYTHON_VER} \
        python${PYTHON_VER}-dev
 
-#Hacky form of try except
-RUN    apt-get install -y --no-install-recommends python${PYTHON_VER}-distutils || apt-get install -y --no-install-recommends python3-distutils
-
+# Try to install python-distutils or quit because we assume the came with the distribution. Shitty hack to get around the python 3.6+ / Ubuntu 16.04 mess
+RUN    apt-get install -y --no-install-recommends python${PYTHON_VER}-distutils || apt-get install -y --no-install-recommends python3-distutils || true
 
 RUN    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
        python${PYTHON_VER} get-pip.py && \
