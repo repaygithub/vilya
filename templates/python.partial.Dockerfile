@@ -7,9 +7,11 @@ RUN    apt-add-repository ppa:deadsnakes/ppa && \
        apt-get update -y && \
        apt-get install -y --no-install-recommends \
        python${PYTHON_VER} \
-       python${PYTHON_VER}-dev  {% if python_version > 3.6 %}\
-       python${PYTHON_VER}-distutils
-{% endif %}
+       python${PYTHON_VER}-dev
+
+#Hacky form of try except
+RUN    apt-get install -y --no-install-recommends python${PYTHON_VER}-distutils || apt-get install -y --no-install-recommends python3-distutils
+
 
 RUN    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
        python${PYTHON_VER} get-pip.py && \
