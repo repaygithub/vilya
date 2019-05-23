@@ -17,9 +17,9 @@ options:
     - False
 
   tensorflow_version:
-    - False
-    - "1.13.1"
-    - "2.0.0a0"
+   - False
+   - "1.13.1"
+   - "2.0.0a0"
 
 
 

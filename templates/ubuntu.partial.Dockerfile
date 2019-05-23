@@ -17,4 +17,6 @@ RUN apt-get update && \
     bzip2 \
     ca-certificates \
     locales \
-    fonts-liberation
+    fonts-liberation \
+    git
+

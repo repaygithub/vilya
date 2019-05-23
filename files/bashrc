@@ -1,0 +1,45 @@
+# If not running interactively, don't do anything
+[ -z "$PS1" ] && return
+
+#load bash aliases
+if [ -f ~/.bash_aliases.sh ]; then
+	source ~/.bash_aliases.sh
+fi
+
+#load bash functions
+if [ -f ~/.bash_functions.sh ]; then
+	source ~/.bash_functions.sh
+fi
+
+#load git functions
+if [ -f ~/.git_functions.sh ]; then
+   source ~/.git_functions.sh
+fi
+
+#load virtual_environment functions
+if [ -f ~/.venv_functions.sh ]; then
+    source ~/.venv_functions.sh
+fi
+
+if [ -f ~/.local_aliases.sh ]; then
+    source ~/.local_aliases.sh
+fi
+#bash_history settings
+HISTCONTROL=ignoreboth
+shopt -s histappend
+HISTSIZE=10000
+HISTFILESIZE=20000
+
+# check the window size after each command and, if necessary, update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+#enabel completion features
+if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+    . /etc/bash_completion
+fi
+
+
+if [[ -f ~/.prompt.sh ]]; then
+    source ~/.prompt.sh
+fi
+

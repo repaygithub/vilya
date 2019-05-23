@@ -1,9 +1,7 @@
-RUN apt-get install -y --no-install-recommends gpg-agent || true
-
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
-    sudo apt-get install -y nodejs
-
-RUN pip install    \
+RUN apt-get install -y --no-install-recommends gpg-agent || true && \
+    curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
+    sudo apt-get install -y nodejs && \
+    pip install    \
     notebook==5.7.8 \
     jupyterhub==1.0.0 \
     jupyterlab==0.35.5 && \
