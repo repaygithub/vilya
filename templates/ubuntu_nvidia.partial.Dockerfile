@@ -32,7 +32,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
         locales \
         fonts-liberation \
-        git
+        git && \
+        rm -rf /var/lib/apt/lists/*
 
 
 

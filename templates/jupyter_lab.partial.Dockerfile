@@ -1,7 +1,7 @@
 RUN apt-get install -y --no-install-recommends gpg-agent || true && \
     curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
     sudo apt-get install -y nodejs && \
-    pip install    \
+    pip --no-cache-dir install    \
     notebook==5.7.8 \
     jupyterhub==1.0.0 \
     jupyterlab==0.35.5 && \
@@ -9,7 +9,9 @@ RUN apt-get install -y --no-install-recommends gpg-agent || true && \
     npm cache clean --force &&\
     jupyter notebook --generate-config && \
     rm -rf /home/$NB_USER/.cache/yarn &&\
-    fix-permissions /home/$NB_USER
+    fix-permissions /home/$NB_USER && \
+    rm -rf /var/lib/apt/lists/*
+
 
 EXPOSE 8888
 

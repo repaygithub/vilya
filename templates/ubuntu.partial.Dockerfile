@@ -18,5 +18,6 @@ RUN apt-get update && \
     ca-certificates \
     locales \
     fonts-liberation \
-    git
+    git && \
+    rm -rf /var/lib/apt/lists/*
 

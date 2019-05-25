@@ -1,0 +1,6 @@
+.gitignore
+.assemble.py
+options.yaml
+README.md
+requirements.txt
+templates/*

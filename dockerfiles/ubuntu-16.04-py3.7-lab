@@ -20,7 +20,8 @@ RUN apt-get update && \
     ca-certificates \
     locales \
     fonts-liberation \
-    git
+    git && \
+    rm -rf /var/lib/apt/lists/*
 
 LABEL maintainer="Dylan Storey <dstorey@repay.com>"
 ARG NB_USER="elrond"
@@ -28,7 +29,7 @@ ARG NB_UID="1000"
 ARG NB_GID="100"
 
 
-
+USER root
 
 ENV NB_USER=$NB_USER \
     NB_UID=$NB_UID \
@@ -41,12 +42,12 @@ ADD files/fix-permissions /usr/local/bin/fix-permissions
 RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
     sed -i.bak -e 's/^%admin/#%admin/' /etc/sudoers && \
     sed -i.bak -e 's/^%sudo/#%sudo/' /etc/sudoers && \
-    useradd -m -s /bin/bash -N -u $NB_UID $NB_USER && \
+    useradd -m -s /bin/bash -N -ou $NB_UID $NB_USER && \
     chmod g+w /etc/passwd && \
     fix-permissions /home/$NB_USER
 
 
-USER root
+
 ARG PYTHON_VER=3.7
 
 ENV LANG C.UTF-8
@@ -56,24 +57,21 @@ RUN    apt-add-repository ppa:deadsnakes/ppa && \
        apt-get update -y && \
        apt-get install -y --no-install-recommends \
        python${PYTHON_VER} \
-       python${PYTHON_VER}-dev
-
-
-# Try to install python-distutils or quit because we assume the came with the distribution. Shitty hack to get around the python 3.6+ / Ubuntu 16.04 mess
-RUN    apt-get install -y --no-install-recommends python${PYTHON_VER}-distutils || apt-get install -y --no-install-recommends python3-distutils || true
-RUN    apt-get install -y --no-install-recommends python${PYTHON_VER}-virtualenv || apt-get install -y --no-install-recommends python3-virtualenv || true
-
-RUN    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+       python${PYTHON_VER}-dev && \
+       apt-get install -y --no-install-recommends python${PYTHON_VER}-distutils || apt-get install -y --no-install-recommends python3-distutils || true && \
+       apt-get install -y --no-install-recommends python${PYTHON_VER}-virtualenv || apt-get install -y --no-install-recommends python3-virtualenv || true && \
+       curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
        python${PYTHON_VER} get-pip.py && \
        rm get-pip.py  &&  \
        ln -s $(which python${PYTHON_VER}) /usr/local/bin/python &&\
        pip --no-cache-dir install --upgrade \
        pip \
-       setuptools
+       setuptools && \
+       rm -rf /var/lib/apt/lists/*
 RUN apt-get install -y --no-install-recommends gpg-agent || true && \
     curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
     sudo apt-get install -y nodejs && \
-    pip install    \
+    pip --no-cache-dir install    \
     notebook==5.7.8 \
     jupyterhub==1.0.0 \
     jupyterlab==0.35.5 && \
@@ -81,7 +79,9 @@ RUN apt-get install -y --no-install-recommends gpg-agent || true && \
     npm cache clean --force &&\
     jupyter notebook --generate-config && \
     rm -rf /home/$NB_USER/.cache/yarn &&\
-    fix-permissions /home/$NB_USER
+    fix-permissions /home/$NB_USER && \
+    rm -rf /var/lib/apt/lists/*
+
 
 EXPOSE 8888
 
@@ -100,16 +100,11 @@ COPY files/start-singleuser.sh /usr/local/bin/
 COPY files/jupyter_notebook_config.py /etc/jupyter/
 RUN fix-permissions /etc/jupyter/
 
-RUN apt-get clean && rm -rf /var/lib/apt/lists/
 WORKDIR /home/$NB_USER
-
 
 COPY files/bash_profile.sh /home/$NB_USER/.bash_profile
 COPY files/bashrc /home/$NB_USER/.bashrc
 COPY files/git_functions.sh /home/$NB_USER/.git_functions.sh
 COPY files/prompt.sh /home/$NB_USER/.prompt.sh
-
-
-
 
 USER $NB_UID

@@ -1,4 +1,2 @@
 
-ENTRYPOINT ["/bin/bash"]
-
 
