@@ -1,4 +1,5 @@
-RUN apt-get install -y --no-install-recommends gpg-agent || true && \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gpg-agent || true && \
     curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
     sudo apt-get install -y nodejs && \
     pip --no-cache-dir install    \
