@@ -65,6 +65,13 @@ RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
     fix-permissions /home/$NB_USER
 
 
+COPY files/git-lfs-linux-amd64-v2.7.2.tar.gz /tmp
+
+RUN  tar xfz /tmp/git-lfs-linux-amd64-v2.7.2.tar.gz && \
+     chmod +x install.sh &&\
+     ./install.sh &&\
+     rm git-lfs install.sh && \
+     rm /tmp/git-lfs-linux-amd64-v2.7.2.tar.gz
 
 ARG PYTHON_VER=3.6
 
@@ -85,6 +92,7 @@ RUN    apt-add-repository ppa:deadsnakes/ppa && \
        pip --no-cache-dir install --upgrade \
        pip \
        setuptools && \
+       apt-get purge -y --auto-remove gpg-agent || true && \
        rm -rf /var/lib/apt/lists/*
 ARG TF_PACKAGE=tensorflow-gpu==2.0.0a0
 

@@ -22,4 +22,11 @@ RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
     fix-permissions /home/$NB_USER
 
 
+COPY files/git-lfs-linux-amd64-v2.7.2.tar.gz /tmp
+
+RUN  tar xfz /tmp/git-lfs-linux-amd64-v2.7.2.tar.gz && \
+     chmod +x install.sh &&\
+     ./install.sh &&\
+     rm git-lfs install.sh && \
+     rm /tmp/git-lfs-linux-amd64-v2.7.2.tar.gz
 

@@ -13,6 +13,7 @@ RUN apt-get update && \
     software-properties-common \
     unzip \
     sudo \
+    curl \
      wget \
     bzip2 \
     ca-certificates \

@@ -17,4 +17,5 @@ RUN    apt-add-repository ppa:deadsnakes/ppa && \
        pip --no-cache-dir install --upgrade \
        pip \
        setuptools && \
+       apt-get purge -y --auto-remove gpg-agent || true && \
        rm -rf /var/lib/apt/lists/*
